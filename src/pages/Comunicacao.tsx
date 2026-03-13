@@ -44,8 +44,17 @@ const Comunicacao = () => {
   const handleEdit = (c: Comunicado) => {
     setTitulo(c.titulo);
     setMensagem(c.mensagem);
+    setImagem(c.imagem || null);
     setEditingId(c.id);
     setShowForm(true);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setImagem(ev.target?.result as string);
+    reader.readAsDataURL(file);
   };
 
   const handleSave = () => {
