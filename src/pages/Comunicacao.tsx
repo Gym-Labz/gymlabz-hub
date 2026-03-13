@@ -29,12 +29,14 @@ const Comunicacao = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [titulo, setTitulo] = useState("");
   const [mensagem, setMensagem] = useState("");
+  const [imagem, setImagem] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
 
   const resetForm = () => {
     setTitulo("");
     setMensagem("");
+    setImagem(null);
     setEditingId(null);
     setShowForm(false);
   };
