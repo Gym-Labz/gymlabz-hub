@@ -29,6 +29,7 @@ const Comunicacao = () => {
   const [titulo, setTitulo] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   const resetForm = () => {
     setTitulo("");
