@@ -62,7 +62,7 @@ const Comunicacao = () => {
 
     if (editingId) {
       setComunicados((prev) =>
-        prev.map((c) => (c.id === editingId ? { ...c, titulo, mensagem } : c))
+        prev.map((c) => (c.id === editingId ? { ...c, titulo, mensagem, imagem: imagem || undefined } : c))
       );
     } else {
       const novo: Comunicado = {
