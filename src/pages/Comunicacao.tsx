@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Pencil, Trash2, X, Send } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, X, Send, Eye, ThumbsUp, BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,12 +11,14 @@ interface Comunicado {
   titulo: string;
   mensagem: string;
   data: string;
+  visualizacoes: number;
+  likes: number;
 }
 
 const initialData: Comunicado[] = [
-  { id: "1", titulo: "Horário de Carnaval", mensagem: "A academia funcionará em horário reduzido durante o Carnaval: 8h às 14h.", data: "2026-03-10" },
-  { id: "2", titulo: "Novo equipamento", mensagem: "Chegaram novos equipamentos na sala de musculação. Venham conferir!", data: "2026-03-08" },
-  { id: "3", titulo: "Manutenção piscina", mensagem: "A piscina ficará em manutenção no dia 15/03. Pedimos desculpas pelo transtorno.", data: "2026-03-05" },
+  { id: "1", titulo: "Horário de Carnaval", mensagem: "A academia funcionará em horário reduzido durante o Carnaval: 8h às 14h.", data: "2026-03-10", visualizacoes: 142, likes: 38 },
+  { id: "2", titulo: "Novo equipamento", mensagem: "Chegaram novos equipamentos na sala de musculação. Venham conferir!", data: "2026-03-08", visualizacoes: 231, likes: 87 },
+  { id: "3", titulo: "Manutenção piscina", mensagem: "A piscina ficará em manutenção no dia 15/03. Pedimos desculpas pelo transtorno.", data: "2026-03-05", visualizacoes: 98, likes: 12 },
 ];
 
 const Comunicacao = () => {
@@ -27,6 +29,7 @@ const Comunicacao = () => {
   const [titulo, setTitulo] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   const resetForm = () => {
     setTitulo("");
@@ -55,6 +58,8 @@ const Comunicacao = () => {
         titulo,
         mensagem,
         data: new Date().toISOString().split("T")[0],
+        visualizacoes: 0,
+        likes: 0,
       };
       setComunicados((prev) => [novo, ...prev]);
     }
@@ -166,6 +171,12 @@ const Comunicacao = () => {
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <button
+                    onClick={() => setDetailId(c.id)}
+                    className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-secondary transition-colors"
+                  >
+                    <BarChart2 size={16} />
+                  </button>
+                  <button
                     onClick={() => handleEdit(c)}
                     className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-secondary transition-colors"
                   >
@@ -180,6 +191,20 @@ const Comunicacao = () => {
                 </div>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">{c.mensagem}</p>
+
+              {/* Detail panel */}
+              {detailId === c.id && (
+                <div className="flex items-center gap-4 pt-2 border-t border-border mt-2">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <Eye size={14} className="text-primary" />
+                    <span className="text-xs font-medium">{c.visualizacoes} visualizações</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <ThumbsUp size={14} className="text-primary" />
+                    <span className="text-xs font-medium">{c.likes} curtidas</span>
+                  </div>
+                </div>
+              )}
             </div>
           ))
         )}
