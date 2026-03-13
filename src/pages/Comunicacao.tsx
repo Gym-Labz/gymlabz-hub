@@ -203,6 +203,9 @@ const Comunicacao = () => {
                   </button>
                 </div>
               </div>
+              {c.imagem && (
+                <img src={c.imagem} alt={c.titulo} className="w-full rounded-lg object-cover max-h-48 border border-border" />
+              )}
               <p className="text-sm text-muted-foreground leading-relaxed">{c.mensagem}</p>
 
               {/* Detail panel */}
