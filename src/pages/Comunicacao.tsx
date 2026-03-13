@@ -171,6 +171,12 @@ const Comunicacao = () => {
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <button
+                    onClick={() => setDetailId(c.id)}
+                    className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-secondary transition-colors"
+                  >
+                    <BarChart2 size={16} />
+                  </button>
+                  <button
                     onClick={() => handleEdit(c)}
                     className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-secondary transition-colors"
                   >
@@ -185,6 +191,20 @@ const Comunicacao = () => {
                 </div>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">{c.mensagem}</p>
+
+              {/* Detail panel */}
+              {detailId === c.id && (
+                <div className="flex items-center gap-4 pt-2 border-t border-border mt-2">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <Eye size={14} className="text-primary" />
+                    <span className="text-xs font-medium">{c.visualizacoes} visualizações</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <ThumbsUp size={14} className="text-primary" />
+                    <span className="text-xs font-medium">{c.likes} curtidas</span>
+                  </div>
+                </div>
+              )}
             </div>
           ))
         )}
