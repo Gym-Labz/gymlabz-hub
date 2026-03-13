@@ -11,12 +11,14 @@ interface Comunicado {
   titulo: string;
   mensagem: string;
   data: string;
+  visualizacoes: number;
+  likes: number;
 }
 
 const initialData: Comunicado[] = [
-  { id: "1", titulo: "Horário de Carnaval", mensagem: "A academia funcionará em horário reduzido durante o Carnaval: 8h às 14h.", data: "2026-03-10" },
-  { id: "2", titulo: "Novo equipamento", mensagem: "Chegaram novos equipamentos na sala de musculação. Venham conferir!", data: "2026-03-08" },
-  { id: "3", titulo: "Manutenção piscina", mensagem: "A piscina ficará em manutenção no dia 15/03. Pedimos desculpas pelo transtorno.", data: "2026-03-05" },
+  { id: "1", titulo: "Horário de Carnaval", mensagem: "A academia funcionará em horário reduzido durante o Carnaval: 8h às 14h.", data: "2026-03-10", visualizacoes: 142, likes: 38 },
+  { id: "2", titulo: "Novo equipamento", mensagem: "Chegaram novos equipamentos na sala de musculação. Venham conferir!", data: "2026-03-08", visualizacoes: 231, likes: 87 },
+  { id: "3", titulo: "Manutenção piscina", mensagem: "A piscina ficará em manutenção no dia 15/03. Pedimos desculpas pelo transtorno.", data: "2026-03-05", visualizacoes: 98, likes: 12 },
 ];
 
 const Comunicacao = () => {
