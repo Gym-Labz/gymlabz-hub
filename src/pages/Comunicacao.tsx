@@ -13,6 +13,7 @@ interface Comunicado {
   data: string;
   visualizacoes: number;
   likes: number;
+  imagem?: string;
 }
 
 const initialData: Comunicado[] = [
