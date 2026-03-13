@@ -134,6 +134,36 @@ const Comunicacao = () => {
                   rows={4}
                   className="bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary resize-none"
                 />
+
+                {/* Image upload */}
+                <div>
+                  <label
+                    htmlFor="img-upload"
+                    className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <ImagePlus size={18} />
+                    <span>{imagem ? "Trocar imagem" : "Adicionar imagem"}</span>
+                  </label>
+                  <input
+                    id="img-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+                  {imagem && (
+                    <div className="relative mt-2 rounded-lg overflow-hidden border border-border">
+                      <img src={imagem} alt="Preview" className="w-full max-h-40 object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setImagem(null)}
+                        className="absolute top-1 right-1 p-1 rounded-full bg-background/80 text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <Button
