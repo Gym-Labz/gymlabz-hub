@@ -12,8 +12,16 @@ export default {
         "2xl": "1400px",
       },
     },
+    fontFamily: {
+      outfit: ['Outfit', 'sans-serif'],
+    },
     extend: {
       colors: {
+        gym: {
+          gold: "hsl(var(--gym-gold))",
+          dark: "hsl(var(--gym-dark))",
+          "card-hover": "hsl(var(--gym-card-hover))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
