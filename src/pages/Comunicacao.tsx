@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Pencil, Trash2, X, Send, Eye, ThumbsUp, BarChart2 } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, X, Send, Eye, ThumbsUp, BarChart2, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,7 @@ interface Comunicado {
   data: string;
   visualizacoes: number;
   likes: number;
+  imagem?: string;
 }
 
 const initialData: Comunicado[] = [
@@ -28,12 +29,14 @@ const Comunicacao = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [titulo, setTitulo] = useState("");
   const [mensagem, setMensagem] = useState("");
+  const [imagem, setImagem] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
 
   const resetForm = () => {
     setTitulo("");
     setMensagem("");
+    setImagem(null);
     setEditingId(null);
     setShowForm(false);
   };
@@ -41,8 +44,17 @@ const Comunicacao = () => {
   const handleEdit = (c: Comunicado) => {
     setTitulo(c.titulo);
     setMensagem(c.mensagem);
+    setImagem(c.imagem || null);
     setEditingId(c.id);
     setShowForm(true);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setImagem(ev.target?.result as string);
+    reader.readAsDataURL(file);
   };
 
   const handleSave = () => {
@@ -50,7 +62,7 @@ const Comunicacao = () => {
 
     if (editingId) {
       setComunicados((prev) =>
-        prev.map((c) => (c.id === editingId ? { ...c, titulo, mensagem } : c))
+        prev.map((c) => (c.id === editingId ? { ...c, titulo, mensagem, imagem: imagem || undefined } : c))
       );
     } else {
       const novo: Comunicado = {
@@ -60,6 +72,7 @@ const Comunicacao = () => {
         data: new Date().toISOString().split("T")[0],
         visualizacoes: 0,
         likes: 0,
+        imagem: imagem || undefined,
       };
       setComunicados((prev) => [novo, ...prev]);
     }
@@ -121,6 +134,36 @@ const Comunicacao = () => {
                   rows={4}
                   className="bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary resize-none"
                 />
+
+                {/* Image upload */}
+                <div>
+                  <label
+                    htmlFor="img-upload"
+                    className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <ImagePlus size={18} />
+                    <span>{imagem ? "Trocar imagem" : "Adicionar imagem"}</span>
+                  </label>
+                  <input
+                    id="img-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+                  {imagem && (
+                    <div className="relative mt-2 rounded-lg overflow-hidden border border-border">
+                      <img src={imagem} alt="Preview" className="w-full max-h-40 object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setImagem(null)}
+                        className="absolute top-1 right-1 p-1 rounded-full bg-background/80 text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <Button
@@ -190,6 +233,9 @@ const Comunicacao = () => {
                   </button>
                 </div>
               </div>
+              {c.imagem && (
+                <img src={c.imagem} alt={c.titulo} className="w-full rounded-lg object-cover max-h-48 border border-border" />
+              )}
               <p className="text-sm text-muted-foreground leading-relaxed">{c.mensagem}</p>
 
               {/* Detail panel */}
