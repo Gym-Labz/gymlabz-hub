@@ -14,14 +14,14 @@ import {
 import logo from "@/assets/gymlabz-logo.png";
 
 const menuItems = [
-  { title: "Comunicação", icon: MessageSquare, description: "Mensagens e avisos" },
-  { title: "Planos", icon: CreditCard, description: "Gerenciar planos" },
-  { title: "Alunos", icon: Users, description: "Cadastro de alunos" },
-  { title: "Acesso", icon: DoorOpen, description: "Registros de entrada" },
-  { title: "Financeiro", icon: DollarSign, description: "Receitas e despesas" },
-  { title: "Funcionários", icon: UserCog, description: "Equipe da academia" },
-  { title: "Controle de Acesso", icon: ShieldCheck, description: "Permissões e regras" },
-  { title: "Relatórios", icon: BarChart3, description: "Dados e estatísticas" },
+  { title: "Comunicação", icon: MessageSquare, description: "Mensagens e avisos", route: "/comunicacao" },
+  { title: "Planos", icon: CreditCard, description: "Gerenciar planos", route: "" },
+  { title: "Alunos", icon: Users, description: "Cadastro de alunos", route: "" },
+  { title: "Acesso", icon: DoorOpen, description: "Registros de entrada", route: "" },
+  { title: "Financeiro", icon: DollarSign, description: "Receitas e despesas", route: "" },
+  { title: "Funcionários", icon: UserCog, description: "Equipe da academia", route: "" },
+  { title: "Controle de Acesso", icon: ShieldCheck, description: "Permissões e regras", route: "" },
+  { title: "Relatórios", icon: BarChart3, description: "Dados e estatísticas", route: "" },
 ];
 
 const Dashboard = () => {
@@ -59,7 +59,8 @@ const Dashboard = () => {
           {menuItems.map((item) => (
             <button
               key={item.title}
-              className="group flex flex-col items-center gap-3 p-5 sm:p-6 rounded-xl bg-card border border-border hover:border-primary/40 hover:bg-gym-card-hover transition-all duration-200 gym-card-glow"
+              onClick={() => item.route && navigate(item.route)}
+              className="group flex flex-col items-center gap-3 p-5 sm:p-6 rounded-xl bg-card border border-border hover:border-primary/40 hover:bg-gym-card-hover transition-all duration-200 gym-card-glow cursor-pointer"
             >
               <div className="w-12 h-12 rounded-lg gym-gradient flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                 <item.icon className="h-6 w-6 text-primary-foreground" />
