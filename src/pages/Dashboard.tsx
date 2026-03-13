@@ -59,7 +59,8 @@ const Dashboard = () => {
           {menuItems.map((item) => (
             <button
               key={item.title}
-              className="group flex flex-col items-center gap-3 p-5 sm:p-6 rounded-xl bg-card border border-border hover:border-primary/40 hover:bg-gym-card-hover transition-all duration-200 gym-card-glow"
+              onClick={() => item.route && navigate(item.route)}
+              className="group flex flex-col items-center gap-3 p-5 sm:p-6 rounded-xl bg-card border border-border hover:border-primary/40 hover:bg-gym-card-hover transition-all duration-200 gym-card-glow cursor-pointer"
             >
               <div className="w-12 h-12 rounded-lg gym-gradient flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                 <item.icon className="h-6 w-6 text-primary-foreground" />
