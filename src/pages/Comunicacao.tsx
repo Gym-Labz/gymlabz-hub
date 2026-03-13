@@ -72,6 +72,7 @@ const Comunicacao = () => {
         data: new Date().toISOString().split("T")[0],
         visualizacoes: 0,
         likes: 0,
+        imagem: imagem || undefined,
       };
       setComunicados((prev) => [novo, ...prev]);
     }
