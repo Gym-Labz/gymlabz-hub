@@ -16,12 +16,12 @@ import logo from "@/assets/gymlabz-logo.png";
 const menuItems = [
   { title: "Comunicação", icon: MessageSquare, description: "Mensagens e avisos", route: "/comunicacao" },
   { title: "Planos", icon: CreditCard, description: "Gerenciar planos", route: "/planos" },
-  { title: "Alunos", icon: Users, description: "Cadastro de alunos", route: "" },
-  { title: "Acesso", icon: DoorOpen, description: "Registros de entrada", route: "" },
-  { title: "Financeiro", icon: DollarSign, description: "Receitas e despesas", route: "" },
-  { title: "Funcionários", icon: UserCog, description: "Equipe da academia", route: "" },
-  { title: "Controle de Acesso", icon: ShieldCheck, description: "Permissões e regras", route: "" },
-  { title: "Relatórios", icon: BarChart3, description: "Dados e estatísticas", route: "" },
+  { title: "Alunos", icon: Users, description: "Cadastro de alunos", route: "/alunos" },
+  { title: "Acesso", icon: DoorOpen, description: "Registros de entrada", route: "/acesso" },
+  { title: "Financeiro", icon: DollarSign, description: "Receitas e despesas", route: "/financeiro" },
+  { title: "Funcionários", icon: UserCog, description: "Equipe da academia", route: "/funcionarios" },
+  { title: "Controle de Acesso", icon: ShieldCheck, description: "Permissões e regras", route: "/controle-acesso" },
+  { title: "Relatórios", icon: BarChart3, description: "Dados e estatísticas", route: "/relatorios" },
 ];
 
 const Dashboard = () => {
