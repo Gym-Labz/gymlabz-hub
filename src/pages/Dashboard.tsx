@@ -15,7 +15,7 @@ import logo from "@/assets/gymlabz-logo.png";
 
 const menuItems = [
   { title: "Comunicação", icon: MessageSquare, description: "Mensagens e avisos", route: "/comunicacao" },
-  { title: "Planos", icon: CreditCard, description: "Gerenciar planos", route: "" },
+  { title: "Planos", icon: CreditCard, description: "Gerenciar planos", route: "/planos" },
   { title: "Alunos", icon: Users, description: "Cadastro de alunos", route: "" },
   { title: "Acesso", icon: DoorOpen, description: "Registros de entrada", route: "" },
   { title: "Financeiro", icon: DollarSign, description: "Receitas e despesas", route: "" },
