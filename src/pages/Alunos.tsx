@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, Pencil, X, Search, Loader2, DollarSign, DoorOpen, Dumbbell, Edit3 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import logo from "@/assets/gymlabz-logo.png";
@@ -36,10 +37,18 @@ interface Aluno {
   plano: string;
   status: "ativo" | "inativo";
   criadoEm: string;
+  imageUrl?: string | null;
+}
+
+function getIniciais(nome: string): string {
+  const parts = nome.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
 function mapUserToAluno(
-  u: UserByGymId,
+  u: UserByGymId & { imageUrl?: string | null },
   planByUserId: Record<string, string>
 ): Aluno {
   return {
@@ -49,6 +58,7 @@ function mapUserToAluno(
     plano: planByUserId[u.id] || "-",
     status: u.isActive ? "ativo" : "inativo",
     criadoEm: "-",
+    imageUrl: u.imageUrl ?? null,
   };
 }
 
@@ -413,29 +423,39 @@ const Alunos = () => {
                 key={aluno.id}
                 className="p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-semibold text-foreground truncate">
-                        {aluno.nome}
-                      </p>
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                          aluno.status === "ativo"
-                            ? "bg-primary/20 text-primary"
-                            : "bg-destructive/20 text-destructive"
-                        }`}
-                      >
-                        {aluno.status}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 mt-1">
-                      <span className="text-sm text-muted-foreground">
-                        {aluno.email}
-                      </span>
-                      <span className="text-xs text-primary font-medium">
-                        {aluno.plano}
-                      </span>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Avatar className="h-12 w-12 shrink-0">
+                      {aluno.imageUrl && (
+                        <AvatarImage src={aluno.imageUrl} alt={aluno.nome} />
+                      )}
+                      <AvatarFallback className="bg-primary/20 text-primary font-semibold text-sm">
+                        {getIniciais(aluno.nome)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-foreground truncate">
+                          {aluno.nome}
+                        </p>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+                            aluno.status === "ativo"
+                              ? "bg-primary/20 text-primary"
+                              : "bg-destructive/20 text-destructive"
+                          }`}
+                        >
+                          {aluno.status}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4 mt-1">
+                        <span className="text-sm text-muted-foreground truncate">
+                          {aluno.email}
+                        </span>
+                        <span className="text-xs text-primary font-medium shrink-0">
+                          {aluno.plano}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 ml-3">
@@ -569,16 +589,16 @@ const Alunos = () => {
             className="bg-card border border-border rounded-2xl w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col shadow-2xl shadow-black/40 animate-modal-in"
             style={{ animationFillMode: "both" }}
           >
-            {/* Header com gradiente */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-primary/20 via-primary/5 to-transparent p-6 border-b border-border/50">
+            {/* Header com gradiente - shrink-0 para nunca encolher, overflow-visible para não cortar o X */}
+            <div className="relative shrink-0 bg-gradient-to-br from-primary/20 via-primary/5 to-transparent p-6 border-b border-border/50 rounded-t-2xl">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_hsl(var(--primary)/0.15)_0%,_transparent_60%)]" />
-              <div className="relative flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-primary/20 text-primary animate-pulse-soft">
+              <div className="relative flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="p-2.5 rounded-xl bg-primary/20 text-primary animate-pulse-soft shrink-0">
                     <Dumbbell size={24} strokeWidth={2.5} />
                   </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-foreground tracking-tight">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-xl font-bold text-foreground tracking-tight break-words">
                       Treino de {trainingAluno.nome}
                     </h2>
                     <p className="text-sm text-muted-foreground mt-0.5">
@@ -586,7 +606,7 @@ const Alunos = () => {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   {canEditTraining && (
                     <Button
                       variant="secondary"
@@ -619,6 +639,7 @@ const Alunos = () => {
                       setTrainingData(null);
                     }}
                     className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-colors duration-200"
+                    aria-label="Fechar"
                   >
                     <X size={20} />
                   </button>
@@ -626,8 +647,8 @@ const Alunos = () => {
               </div>
             </div>
 
-            {/* Conteúdo */}
-            <div className="flex-1 overflow-y-auto p-6">
+            {/* Conteúdo - min-h-0 necessário para overflow funcionar em flex */}
+            <div className="flex-1 min-h-0 overflow-y-auto p-6">
               {trainingLoading ? (
                 <div className="space-y-3 animate-pulse-soft">
                   {[1, 2, 3].map((i) => (

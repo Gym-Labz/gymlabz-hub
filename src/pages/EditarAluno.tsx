@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Camera, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   getUserById,
@@ -17,6 +18,7 @@ import {
   getUserSubscriptions,
 } from "@/lib/subscriptions-api";
 import { getPlans } from "@/lib/plans-api";
+import { getUserImages, uploadUserImage } from "@/lib/user-images-api";
 
 function parseNome(nome: string): { firstName: string; lastName: string } {
   const parts = nome.trim().split(/\s+/);
@@ -89,6 +91,32 @@ const EditarAluno = () => {
   const [injuryHistory, setInjuryHistory] = useState("");
   const [medicalCertificateProvided, setMedicalCertificateProvided] = useState(false);
 
+  const [primaryImageUrl, setPrimaryImageUrl] = useState<string | null>(null);
+  const [pendingPhotoFile, setPendingPhotoFile] = useState<File | null>(null);
+  const [pendingPhotoPreviewUrl, setPendingPhotoPreviewUrl] = useState<string | null>(null);
+  const [cameraModalOpen, setCameraModalOpen] = useState(false);
+  const [uploadPhotoLoading, setUploadPhotoLoading] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (pendingPhotoPreviewUrl) URL.revokeObjectURL(pendingPhotoPreviewUrl);
+    };
+  }, [pendingPhotoPreviewUrl]);
+
+  const loadUserImages = useCallback(async () => {
+    if (!token || !id || !isEdit) return;
+    try {
+      const res = await getUserImages(token, id, { type: "profile", limit: 10 });
+      const primary = res.images.find((img) => img.isPrimary) || res.images[0];
+      setPrimaryImageUrl(primary?.imageUrl ?? null);
+    } catch {
+      setPrimaryImageUrl(null);
+    }
+  }, [token, id, isEdit]);
+
   useEffect(() => {
     if (!token) return;
     getPlans(token).then((plans) => {
@@ -135,6 +163,8 @@ const EditarAluno = () => {
       })
       .finally(() => setLoading(false));
 
+    loadUserImages();
+
     getUserSubscriptions(token, id)
       .then((res) => {
         const activeSub = res.data?.find(
@@ -146,7 +176,7 @@ const EditarAluno = () => {
         }
       })
       .catch(() => {});
-  }, [isEdit, id, token]);
+  }, [isEdit, id, token, loadUserImages]);
 
   const handleSave = async () => {
     if (!token || !nome.trim()) return;
@@ -255,6 +285,13 @@ const EditarAluno = () => {
             startDate: new Date().toISOString().split("T")[0] + "T00:00:00.000Z",
           });
         }
+
+        if (pendingPhotoFile) {
+          await uploadUserImage(token, res.id, pendingPhotoFile, {
+            type: "profile",
+            takenAt: new Date().toISOString(),
+          });
+        }
       }
       navigate("/alunos");
     } catch (err: unknown) {
@@ -280,6 +317,115 @@ const EditarAluno = () => {
       setDeleting(false);
     }
   };
+
+  const openCameraModal = async () => {
+    setCameraError(null);
+    setCameraModalOpen(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+      });
+      streamRef.current = stream;
+      setTimeout(() => {
+        if (videoRef.current && stream) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
+    } catch (err) {
+      setCameraError(
+        "Não foi possível acessar a câmera. Verifique as permissões do navegador."
+      );
+    }
+  };
+
+  const closeCameraModal = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    setCameraModalOpen(false);
+    setCameraError(null);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !file.type.startsWith("image/")) return;
+    if (pendingPhotoPreviewUrl) URL.revokeObjectURL(pendingPhotoPreviewUrl);
+    setPendingPhotoFile(file);
+    setPendingPhotoPreviewUrl(URL.createObjectURL(file));
+    e.target.value = "";
+  };
+
+  const removePendingPhoto = () => {
+    if (pendingPhotoPreviewUrl) {
+      URL.revokeObjectURL(pendingPhotoPreviewUrl);
+    }
+    setPendingPhotoFile(null);
+    setPendingPhotoPreviewUrl(null);
+  };
+
+  const handleCapturePhoto = () => {
+    if (!videoRef.current) return;
+    const video = videoRef.current;
+    if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+
+    setUploadPhotoLoading(true);
+    setCameraError(null);
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      setCameraError("Erro ao capturar imagem.");
+      setUploadPhotoLoading(false);
+      return;
+    }
+    ctx.drawImage(video, 0, 0);
+    canvas.toBlob(
+      async (blob) => {
+        if (!blob) {
+          setCameraError("Erro ao capturar imagem.");
+          setUploadPhotoLoading(false);
+          return;
+        }
+        const file = new File([blob], `foto-${Date.now()}.jpg`, {
+          type: "image/jpeg",
+        });
+
+        if (isEdit && id && token) {
+          try {
+            await uploadUserImage(token, id, file, {
+              type: "profile",
+              takenAt: new Date().toISOString(),
+            });
+            await loadUserImages();
+            closeCameraModal();
+          } catch (err) {
+            setCameraError(
+              (err as { message?: string }).message || "Erro ao enviar foto."
+            );
+          } finally {
+            setUploadPhotoLoading(false);
+          }
+        } else {
+          if (pendingPhotoPreviewUrl) URL.revokeObjectURL(pendingPhotoPreviewUrl);
+          setPendingPhotoFile(file);
+          setPendingPhotoPreviewUrl(URL.createObjectURL(blob));
+          closeCameraModal();
+          setUploadPhotoLoading(false);
+        }
+      },
+      "image/jpeg",
+      0.9
+    );
+  };
+
+  function getIniciais(n: string): string {
+    const parts = n.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return "?";
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -331,6 +477,65 @@ const EditarAluno = () => {
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Foto do aluno */}
+            <section className="space-y-4">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase">
+                Foto do aluno
+              </h2>
+              <div className="flex items-center gap-4">
+                <Avatar className="h-20 w-20 shrink-0">
+                  {(isEdit ? primaryImageUrl : pendingPhotoPreviewUrl) && (
+                    <AvatarImage
+                      src={(isEdit ? primaryImageUrl : pendingPhotoPreviewUrl) ?? ""}
+                      alt={nome}
+                    />
+                  )}
+                  <AvatarFallback className="bg-primary/20 text-primary font-semibold text-xl">
+                    {getIniciais(nome)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    onClick={openCameraModal}
+                  >
+                    <Camera size={18} />
+                    Tirar foto
+                  </Button>
+                  {!isEdit && (
+                    <>
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="sr-only"
+                          onChange={handleFileSelect}
+                        />
+                        <span className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
+                          Enviar foto do dispositivo
+                        </span>
+                      </label>
+                      {pendingPhotoFile && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="gap-2 text-muted-foreground hover:text-destructive"
+                          onClick={removePendingPhoto}
+                        >
+                          <X size={16} />
+                          Remover foto
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </section>
+
             {/* Dados básicos */}
             <section className="space-y-4">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase">
@@ -691,6 +896,67 @@ const EditarAluno = () => {
                   "Excluir"
                 )}
               </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Câmera */}
+      {cameraModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm p-4">
+          <div className="bg-card border border-border rounded-xl w-full max-w-md overflow-hidden shadow-xl">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-lg font-bold text-foreground">Tirar foto</h2>
+              <button
+                onClick={closeCameraModal}
+                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                aria-label="Fechar"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-4">
+              {cameraError ? (
+                <div className="py-8 text-center">
+                  <p className="text-sm text-destructive mb-4">{cameraError}</p>
+                  <Button variant="outline" onClick={closeCameraModal}>
+                    Fechar
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex gap-3 mt-4">
+                    <Button
+                      variant="secondary"
+                      className="flex-1"
+                      onClick={closeCameraModal}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      className="flex-1 gap-2"
+                      onClick={handleCapturePhoto}
+                      disabled={uploadPhotoLoading}
+                    >
+                      {uploadPhotoLoading ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
+                        <Camera size={18} />
+                      )}
+                      {uploadPhotoLoading ? "Enviando..." : "Tirar foto"}
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

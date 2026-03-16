@@ -49,6 +49,8 @@ export interface DashboardReport {
   totalDevices: number;
   activeTrainingPlans: number;
   totalTrainers: number;
+  totalEmployees?: number;
+  totalCommunications?: number;
 }
 
 // Pagamento
@@ -85,116 +87,13 @@ export interface OverduePaymentsResponse {
   };
 }
 
-export async function getFinancialReport(
-  token: string,
-  filters?: { startDate?: string; endDate?: string }
-): Promise<FinancialReport> {
-  const params = new URLSearchParams();
-  if (filters?.startDate) params.set("startDate", filters.startDate);
-  if (filters?.endDate) params.set("endDate", filters.endDate);
-  const query = params.toString();
-  const path = `/reports/financial${query ? `?${query}` : ""}`;
-  return apiFetchWithAuth<FinancialReport>(path, token, { method: "GET" });
-}
-
-export async function getDashboardReport(
-  token: string
-): Promise<DashboardReport> {
-  return apiFetchWithAuth<DashboardReport>("/reports/dashboard", token, {
-    method: "GET",
-  });
-}
-
-export async function getPaymentsByGym(
-  token: string,
-  options?: { limit?: number; offset?: number; status?: string }
-): Promise<PaymentListResponse> {
-  const params = new URLSearchParams();
-  if (options?.limit != null) params.set("limit", String(options.limit));
-  if (options?.offset != null) params.set("offset", String(options.offset));
-  if (options?.status) params.set("status", options.status);
-  const query = params.toString();
-  const path = `/payments/gym${query ? `?${query}` : ""}`;
-  return apiFetchWithAuth<PaymentListResponse>(path, token, { method: "GET" });
-}
-
-export async function getOverduePayments(
-  token: string
-): Promise<OverduePaymentsResponse> {
-  return apiFetchWithAuth<OverduePaymentsResponse>("/payments/overdue", token, {
-    method: "GET",
-  });
-}
-
-export async function getPaymentsByUser(
-  token: string,
-  userId: string,
-  options?: { limit?: number; offset?: number }
-): Promise<PaymentListResponse> {
-  const params = new URLSearchParams();
-  if (options?.limit != null) params.set("limit", String(options.limit));
-  if (options?.offset != null) params.set("offset", String(options.offset));
-  const query = params.toString();
-  const path = `/payments/user/${userId}${query ? `?${query}` : ""}`;
-  return apiFetchWithAuth<PaymentListResponse>(path, token, { method: "GET" });
-}
-
 export interface PaymentMethod {
   id: string;
   name: string;
   type: string;
 }
 
-export async function getPaymentMethods(
-  token: string
-): Promise<PaymentMethod[]> {
-  return apiFetchWithAuth<PaymentMethod[]>("/payments/payment-methods", token, {
-    method: "GET",
-  });
-}
-
-export interface CreateSubscriptionPaymentRequest {
-  userId: string;
-  subscriptionId: string;
-  paymentMethodId: string;
-  amount: number;
-  paymentDate: string;
-  dueDate?: string;
-  notes?: string;
-}
-
-export async function createSubscriptionPayment(
-  token: string,
-  data: CreateSubscriptionPaymentRequest
-): Promise<{ id: string; message: string; status: string }> {
-  return apiFetchWithAuth("/payments/subscription-payment", token, {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-}
-
-export interface CreateExtraClassPaymentRequest {
-  userId: string;
-  paymentMethodId: string;
-  gymClassId: string;
-  gymClassName: string;
-  amount: number;
-  paymentDate: string;
-  notes?: string;
-}
-
-export async function createExtraClassPayment(
-  token: string,
-  data: CreateExtraClassPaymentRequest
-): Promise<{ id: string; message: string; status: string }> {
-  return apiFetchWithAuth("/payments/extra-class-payment", token, {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-}
-
-// ========== Relatórios ==========
-
+// Relatórios
 export interface MembersReport {
   summary: {
     totalMembers: number;
@@ -245,6 +144,103 @@ export interface CapacityReport {
   recommendations: { type: string; priority: string; message: string; estimatedCost?: number; expectedROI?: number }[];
 }
 
+// Funções da API
+export async function getFinancialReport(
+  token: string,
+  filters?: { startDate?: string; endDate?: string }
+): Promise<FinancialReport> {
+  const params = new URLSearchParams();
+  if (filters?.startDate) params.set("startDate", filters.startDate);
+  if (filters?.endDate) params.set("endDate", filters.endDate);
+  const query = params.toString();
+  const path = `/reports/financial${query ? `?${query}` : ""}`;
+  return apiFetchWithAuth<FinancialReport>(path, token, { method: "GET" });
+}
+
+export async function getDashboardReport(token: string): Promise<DashboardReport> {
+  return apiFetchWithAuth<DashboardReport>("/reports/dashboard", token, {
+    method: "GET",
+  });
+}
+
+export async function getPaymentsByGym(
+  token: string,
+  options?: { limit?: number; offset?: number; status?: string }
+): Promise<PaymentListResponse> {
+  const params = new URLSearchParams();
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  if (options?.offset != null) params.set("offset", String(options.offset));
+  if (options?.status) params.set("status", options.status);
+  const query = params.toString();
+  const path = `/payments/gym${query ? `?${query}` : ""}`;
+  return apiFetchWithAuth<PaymentListResponse>(path, token, { method: "GET" });
+}
+
+export async function getOverduePayments(token: string): Promise<OverduePaymentsResponse> {
+  return apiFetchWithAuth<OverduePaymentsResponse>("/payments/overdue", token, {
+    method: "GET",
+  });
+}
+
+export async function getPaymentsByUser(
+  token: string,
+  userId: string,
+  options?: { limit?: number; offset?: number }
+): Promise<PaymentListResponse> {
+  const params = new URLSearchParams();
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  if (options?.offset != null) params.set("offset", String(options.offset));
+  const query = params.toString();
+  const path = `/payments/user/${userId}${query ? `?${query}` : ""}`;
+  return apiFetchWithAuth<PaymentListResponse>(path, token, { method: "GET" });
+}
+
+export async function getPaymentMethods(token: string): Promise<PaymentMethod[]> {
+  return apiFetchWithAuth<PaymentMethod[]>("/payments/payment-methods", token, {
+    method: "GET",
+  });
+}
+
+export interface CreateSubscriptionPaymentRequest {
+  userId: string;
+  subscriptionId: string;
+  paymentMethodId: string;
+  amount: number;
+  paymentDate: string;
+  dueDate?: string;
+  notes?: string;
+}
+
+export async function createSubscriptionPayment(
+  token: string,
+  data: CreateSubscriptionPaymentRequest
+): Promise<{ id: string; message: string; status: string }> {
+  return apiFetchWithAuth("/payments/subscription-payment", token, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export interface CreateExtraClassPaymentRequest {
+  userId: string;
+  paymentMethodId: string;
+  gymClassId: string;
+  gymClassName: string;
+  amount: number;
+  paymentDate: string;
+  notes?: string;
+}
+
+export async function createExtraClassPayment(
+  token: string,
+  data: CreateExtraClassPaymentRequest
+): Promise<{ id: string; message: string; status: string }> {
+  return apiFetchWithAuth("/payments/extra-class-payment", token, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 export async function getMembersReport(
   token: string,
   filters?: { startDate?: string; endDate?: string; status?: string; planType?: string }
@@ -255,7 +251,9 @@ export async function getMembersReport(
   if (filters?.status) params.set("status", filters.status);
   if (filters?.planType) params.set("planType", filters.planType);
   const query = params.toString();
-  return apiFetchWithAuth<MembersReport>(`/reports/members${query ? `?${query}` : ""}`, token);
+  return apiFetchWithAuth<MembersReport>(`/reports/members${query ? `?${query}` : ""}`, token, {
+    method: "GET",
+  });
 }
 
 export async function getAccessReport(
@@ -268,14 +266,23 @@ export async function getAccessReport(
   if (filters?.deviceId) params.set("deviceId", filters.deviceId);
   if (filters?.accessMethod) params.set("accessMethod", filters.accessMethod);
   const query = params.toString();
-  return apiFetchWithAuth<AccessReport>(`/reports/access${query ? `?${query}` : ""}`, token);
+  return apiFetchWithAuth<AccessReport>(`/reports/access${query ? `?${query}` : ""}`, token, {
+    method: "GET",
+  });
 }
 
-export async function getPeakHoursReport(token: string, days?: number): Promise<PeakHoursReport> {
+export async function getPeakHoursReport(
+  token: string,
+  days?: number
+): Promise<PeakHoursReport> {
   const params = days != null ? `?days=${days}` : "";
-  return apiFetchWithAuth<PeakHoursReport>(`/reports/analytics/peak-hours${params}`, token);
+  return apiFetchWithAuth<PeakHoursReport>(`/reports/analytics/peak-hours${params}`, token, {
+    method: "GET",
+  });
 }
 
 export async function getCapacityReport(token: string): Promise<CapacityReport> {
-  return apiFetchWithAuth<CapacityReport>("/reports/analytics/capacity", token);
+  return apiFetchWithAuth<CapacityReport>("/reports/analytics/capacity", token, {
+    method: "GET",
+  });
 }
