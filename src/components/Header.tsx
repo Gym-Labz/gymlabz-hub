@@ -3,12 +3,14 @@ import { useAuth } from "@/contexts/AuthContext"
 import { useEffect, useState } from "react"
 import { getGym } from "@/lib/gym-api"
 import { useNavigate } from "react-router-dom"
-import { LogOut, Settings } from "lucide-react"
+import { LogOut, Settings, Menu } from "lucide-react"
+import { useSidebar } from "@/contexts/SidebarContext"
 
 export default function Header() {
   const [gymName, setGymName] = useState<string | null>(null)
-  const { token, logout, profile, hasRole } = useAuth()
+  const { token, logout } = useAuth()
   const navigate = useNavigate()
+  const { toggleMobile } = useSidebar()
 
   useEffect(() => {
     if (!token) return
@@ -34,7 +36,14 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
       <div className="flex items-center justify-between px-6 h-16 w-full">
         <div className="flex items-center gap-3">
-          <img src={logo} alt="GymLabz" className="w-20 h-20 object-contain" />
+          <button
+            onClick={toggleMobile}
+            className="md:hidden p-2 -ml-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-primary/10 transition-colors"
+            title="Menu"
+          >
+            <Menu size={20} />
+          </button>
+          <img src={logo} alt="GymLabz" className="w-20 h-20 object-contain hidden sm:block" />
           <span className="text-lg font-bold tracking-tight text-foreground truncate max-w-[180px] sm:max-w-none">
             {gymName || "GymLabz"}
           </span>

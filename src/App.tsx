@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth, type ProfileEmployee } from "@/contexts/AuthContext";
+import { SidebarProvider } from "@/contexts/SidebarContext";
 import Login from "./pages/Login.tsx";
 import Comunicacao from "./pages/Comunicacao.tsx";
 import Planos from "./pages/Planos.tsx";
@@ -54,7 +55,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route element={<Layout />}>
+            <Route element={<SidebarProvider><Layout /></SidebarProvider>}>
               <Route
                 path="/dashboard"
                 element={
