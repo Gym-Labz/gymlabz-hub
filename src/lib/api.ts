@@ -1,10 +1,16 @@
 /**
  * Cliente API para integração com GymCore Backend
- * Em dev: usa proxy /api -> localhost:3000 (evita CORS)
- * Com VITE_API_URL: usa URL direta do backend
  */
 
-const API_URL = import.meta.env.VITE_API_URL || "/api";
+// Mude esta flag para true se quiser usar o backend local rodando na porta 3000
+const USE_LOCAL_BACKEND = false;
+
+// Em dev com USE_LOCAL_BACKEND = true: usa proxy /api -> localhost:3000 (evita CORS)
+// Default: usa URL direta do backend em produção
+const PROD_URL = "https://gym-core-backend-3c424d5dacf3.herokuapp.com";
+const LOCAL_URL = "/api";
+
+const API_URL = import.meta.env.VITE_API_URL || (USE_LOCAL_BACKEND ? LOCAL_URL : PROD_URL);
 
 export const getApiUrl = () => API_URL;
 
