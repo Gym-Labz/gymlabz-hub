@@ -319,7 +319,8 @@ const Alunos = () => {
         endDate: endDate.toISOString().split("T")[0],
         limit: 100,
       });
-      setAccessData(res.data || []);
+      const data = Array.isArray(res?.data) ? res.data : [];
+      setAccessData(data);
     } catch (err) {
       setError((err as { message?: string }).message || "Erro ao carregar acessos.");
     } finally {
@@ -350,7 +351,34 @@ const Alunos = () => {
     try {
       const res = await allowAccess(token, accessAluno.id);
       if (res.success) {
-        await openAccessModal(accessAluno);
+        const newAccess: AccessReportItem = {
+          id: res.accessId || `temp-${Date.now()}`,
+          userName: accessAluno.nome,
+          accessMethod: "manual",
+          accessStatus: "granted",
+          accessType: "entry",
+          accessDate: new Date().toISOString(),
+        };
+        setAccessData((prev) =>
+          prev ? [newAccess, ...prev] : [newAccess]
+        );
+        try {
+          const endDate = new Date();
+          const startDate = new Date();
+          startDate.setDate(startDate.getDate() - 30);
+          const reportRes = await getAccessReports(token, {
+            userId: accessAluno.id,
+            startDate: startDate.toISOString().split("T")[0],
+            endDate: endDate.toISOString().split("T")[0],
+            limit: 100,
+          });
+          const reportData = Array.isArray(reportRes?.data) ? reportRes.data : [];
+          if (reportData.length) {
+            setAccessData(reportData);
+          }
+        } catch {
+          // Mantém o acesso otimista se o refetch falhar
+        }
       } else {
         setError(res.message);
       }
@@ -530,35 +558,40 @@ const Alunos = () => {
             ) : accessData ? (
               <div className="space-y-4">
                 <p className="text-sm font-semibold text-foreground">
-                  Registros dos últimos 30 dias
+                  Histórico de acessos
                 </p>
                 <div className="space-y-3 max-h-64 overflow-y-auto">
                   {accessData
-                    .filter((a) => a.accessStatus === "granted")
                     .sort(
                       (a, b) =>
                         new Date(b.accessDate).getTime() - new Date(a.accessDate).getTime()
                     )
-                    .map((a) => (
-                      <div
-                        key={a.id}
-                        className="flex items-center justify-between py-2 px-3 rounded-lg bg-muted/50 text-sm"
-                      >
-                        <span className="text-muted-foreground">
-                          {new Date(a.accessDate).toLocaleDateString("pt-BR")} às{" "}
-                          {new Date(a.accessDate).toLocaleTimeString("pt-BR", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
-                        <span className="text-xs text-primary font-medium">
-                          {a.accessMethod === "manual" ? "Manual" : a.accessMethod}
-                        </span>
-                      </div>
-                    ))}
-                  {accessData.filter((a) => a.accessStatus === "granted").length === 0 && (
+                    .map((a) => {
+                      const isGranted = (a.accessStatus || "").toLowerCase() === "granted";
+                      return (
+                        <div
+                          key={a.id}
+                          className={`flex items-center justify-between py-2 px-3 rounded-lg text-sm ${
+                            isGranted ? "bg-primary/10 border border-primary/20" : "bg-muted/50"
+                          }`}
+                        >
+                          <span className="text-muted-foreground">
+                            {new Date(a.accessDate).toLocaleDateString("pt-BR")} às{" "}
+                            {new Date(a.accessDate).toLocaleTimeString("pt-BR", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                          <span className={`text-xs font-medium ${isGranted ? "text-primary" : "text-muted-foreground"}`}>
+                            {(a.accessMethod || "").toLowerCase() === "manual" ? "Manual" : a.accessMethod || "-"}
+                            {!isGranted && ` (${a.accessStatus || "—"})`}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  {accessData.length === 0 && (
                     <p className="text-sm text-muted-foreground py-8 text-center">
-                      Nenhum acesso registrado nos últimos 30 dias.
+                      Nenhum acesso registrado.
                     </p>
                   )}
                 </div>

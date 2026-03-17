@@ -2,8 +2,8 @@
  * Cliente API para integração com GymCore Backend
  */
 
-// Mude esta flag para true se quiser usar o backend local rodando na porta 3000
-const USE_LOCAL_BACKEND = false;
+// Mude esta flag para true para usar o backend local (porta 3000) - necessário para ver acessos no modal
+const USE_LOCAL_BACKEND = true;
 
 // Em dev com USE_LOCAL_BACKEND = true: usa proxy /api -> localhost:3000 (evita CORS)
 // Default: usa URL direta do backend em produção
