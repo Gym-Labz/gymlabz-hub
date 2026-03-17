@@ -428,7 +428,7 @@ const EditarAluno = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto w-full">
+    <div className="w-full">
         <div className="flex items-center justify-between mb-6 mt-4">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold text-foreground">
