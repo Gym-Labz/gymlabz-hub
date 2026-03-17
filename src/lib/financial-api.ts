@@ -201,6 +201,23 @@ export async function getPaymentMethods(token: string): Promise<PaymentMethod[]>
   });
 }
 
+export interface CreatePaymentMethodRequest {
+  name: string;
+  type: string;
+  description?: string;
+  isActive?: boolean;
+}
+
+export async function createPaymentMethod(
+  token: string,
+  data: CreatePaymentMethodRequest
+): Promise<{ id: string; message: string; status: string }> {
+  return apiFetchWithAuth("/payments/payment-methods", token, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 export interface CreateSubscriptionPaymentRequest {
   userId: string;
   subscriptionId: string;

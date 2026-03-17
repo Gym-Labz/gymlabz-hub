@@ -11,6 +11,9 @@ import {
   Loader2,
   BarChart3,
   Activity,
+  Plus,
+  X,
+  Wallet,
 } from "lucide-react";
 import logo from "@/assets/gymlabz-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,14 +24,19 @@ import {
   getAccessReport,
   getPeakHoursReport,
   getCapacityReport,
+  getPaymentMethods,
+  createPaymentMethod,
   type FinancialReport,
   type Payment,
+  type PaymentMethod,
   type MembersReport,
   type AccessReport,
   type PeakHoursReport,
   type CapacityReport,
 } from "@/lib/financial-api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   ChartConfig,
   ChartContainer,
@@ -90,6 +98,11 @@ const Financeiro = () => {
   const [loading, setLoading] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [paymentMethodModalOpen, setPaymentMethodModalOpen] = useState(false);
+  const [newPaymentMethodName, setNewPaymentMethodName] = useState("");
+  const [newPaymentMethodType, setNewPaymentMethodType] = useState("pix");
+  const [savingPaymentMethod, setSavingPaymentMethod] = useState(false);
 
   const loadTab = useCallback(
     async (tab: string) => {
@@ -99,16 +112,18 @@ const Financeiro = () => {
       try {
         switch (tab) {
           case "financeiro": {
-            const [fin, pay] = await Promise.all([
+            const [fin, pay, methods] = await Promise.all([
               getFinancialReport(token),
               getPaymentsByGym(token, {
                 limit: 50,
                 offset: 0,
                 status: statusFilter || undefined,
               }),
+              getPaymentMethods(token),
             ]);
             setFinancial(fin);
             setPayments(pay.payments);
+            setPaymentMethods(methods);
             break;
           }
           case "membros":
@@ -141,7 +156,46 @@ const Financeiro = () => {
     loadTab(activeTab);
   }, [activeTab, loadTab]);
 
+  const handleCreatePaymentMethod = async () => {
+    if (!token || !newPaymentMethodName.trim()) return;
+    setSavingPaymentMethod(true);
+    setError(null);
+    try {
+      await createPaymentMethod(token, {
+        name: newPaymentMethodName.trim(),
+        type: newPaymentMethodType,
+        isActive: true,
+      });
+      setPaymentMethodModalOpen(false);
+      setNewPaymentMethodName("");
+      setNewPaymentMethodType("pix");
+      if (activeTab === "financeiro") {
+        const methods = await getPaymentMethods(token);
+        setPaymentMethods(methods);
+      }
+    } catch (e: unknown) {
+      const msg =
+        e && typeof e === "object" && "message" in e
+          ? String((e as { message: string }).message)
+          : "Erro ao cadastrar método de pagamento";
+      setError(msg);
+    } finally {
+      setSavingPaymentMethod(false);
+    }
+  };
+
   const isLoading = loading[activeTab];
+
+  const PAYMENT_METHOD_TYPES = [
+    { value: "pix", label: "PIX" },
+    { value: "boleto", label: "Boleto" },
+    { value: "credit_card", label: "Cartão de Crédito" },
+    { value: "debit_card", label: "Cartão de Débito" },
+    { value: "cash", label: "Dinheiro" },
+    { value: "bank_transfer", label: "Transferência Bancária" },
+    { value: "app", label: "App" },
+    { value: "other", label: "Outro" },
+  ];
 
   return (
     <div className="w-full">
@@ -242,6 +296,46 @@ const Financeiro = () => {
                     <p className="text-lg font-bold text-foreground">
                       {financial ? fmt(financial.summary.totalRevenue) : "—"}
                     </p>
+                  </div>
+                </div>
+
+                {/* Métodos de Pagamento */}
+                <div className="rounded-xl bg-card border border-border p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                      <Wallet size={18} className="text-primary" />
+                      Métodos de pagamento
+                    </h2>
+                    <Button
+                      size="sm"
+                      className="gap-1.5"
+                      onClick={() => setPaymentMethodModalOpen(true)}
+                    >
+                      <Plus size={16} />
+                      Adicionar
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Cadastre os métodos aceitos pela academia (PIX, cartão, boleto, etc.) para usar ao registrar pagamentos.
+                  </p>
+                  <div className="space-y-2">
+                    {paymentMethods.length === 0 ? (
+                      <p className="text-sm text-muted-foreground py-6 text-center border border-dashed border-border rounded-lg">
+                        Nenhum método cadastrado. Clique em &quot;Adicionar&quot; para registrar.
+                      </p>
+                    ) : (
+                      paymentMethods.map((m) => (
+                        <div
+                          key={m.id}
+                          className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border"
+                        >
+                          <span className="font-medium text-foreground">{m.name}</span>
+                          <span className="text-xs text-muted-foreground capitalize">
+                            {PAYMENT_METHOD_TYPES.find((t) => t.value === m.type)?.label ?? m.type}
+                          </span>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
 
@@ -853,6 +947,83 @@ const Financeiro = () => {
           </TabsContent>
         </Tabs>
 
+        {/* Modal Novo Método de Pagamento */}
+        {paymentMethodModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+            <div className="bg-card border border-border rounded-xl w-full max-w-md p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <Wallet size={20} className="text-primary" />
+                  Novo método de pagamento
+                </h2>
+                <button
+                  onClick={() => {
+                    setPaymentMethodModalOpen(false);
+                    setNewPaymentMethodName("");
+                    setError(null);
+                  }}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">
+                    Nome
+                  </label>
+                  <Input
+                    placeholder="Ex: PIX, Cartão à vista..."
+                    value={newPaymentMethodName}
+                    onChange={(e) => setNewPaymentMethodName(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">
+                    Tipo
+                  </label>
+                  <select
+                    value={newPaymentMethodType}
+                    onChange={(e) => setNewPaymentMethodType(e.target.value)}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  >
+                    {PAYMENT_METHOD_TYPES.map((t) => (
+                      <option key={t.value} value={t.value}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-6">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setPaymentMethodModalOpen(false);
+                    setNewPaymentMethodName("");
+                  }}
+                  disabled={savingPaymentMethod}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  className="flex-1 gap-2"
+                  onClick={handleCreatePaymentMethod}
+                  disabled={savingPaymentMethod || !newPaymentMethodName.trim()}
+                >
+                  {savingPaymentMethod ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Plus size={16} />
+                  )}
+                  Cadastrar
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 };
