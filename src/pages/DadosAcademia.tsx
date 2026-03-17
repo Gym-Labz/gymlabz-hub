@@ -132,21 +132,21 @@ const DadosAcademia = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
-        <div className="flex items-center justify-between px-4 h-16 max-w-5xl mx-auto">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <img src={logo} alt="GymLabz" className="w-9 h-9 object-contain" />
-            <span className="text-lg font-bold tracking-tight">
-              Gym<span className="gym-text-gradient">Labz</span>
-            </span>
+    <div className="w-full">
+        <div className="flex items-center justify-between mb-4 mt-2">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <h1 className="text-2xl font-bold text-foreground">Dados da Academia</h1>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Informações cadastrais da academia
+            </p>
           </div>
           <Button
             onClick={handleSave}
@@ -161,14 +161,6 @@ const DadosAcademia = () => {
             )}
           </Button>
         </div>
-      </header>
-
-      {/* Content */}
-      <main className="flex-1 px-4 py-6 max-w-5xl mx-auto w-full">
-        <h1 className="text-2xl font-bold text-foreground mb-1">Dados da Academia</h1>
-        <p className="text-sm text-muted-foreground mb-6">
-          Informações cadastrais da academia
-        </p>
 
         {error && (
           <div className="p-3 rounded-lg bg-destructive/20 text-destructive text-sm mb-4">
@@ -337,7 +329,7 @@ const DadosAcademia = () => {
             </div>
           </div>
         ) : null}
-      </main>
+
     </div>
   );
 };

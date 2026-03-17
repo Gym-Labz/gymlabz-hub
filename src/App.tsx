@@ -17,6 +17,7 @@ import Funcionarios from "./pages/Funcionarios.tsx";
 import ControleAcesso from "./pages/ControleAcesso.tsx";
 import DadosAcademia from "./pages/DadosAcademia.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Layout from "./components/Layout.tsx";
 
 const queryClient = new QueryClient();
 
@@ -54,102 +55,104 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/comunicacao"
-              element={
-                <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
-                  <Comunicacao />
-                </RoleProtectedRoute>
-              }
-            />
-            <Route
-              path="/planos"
-              element={
-                <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
-                  <Planos />
-                </RoleProtectedRoute>
-              }
-            />
-            <Route
-              path="/aulas"
-              element={
-                <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
-                  <Aulas />
-                </RoleProtectedRoute>
-              }
-            />
-            <Route
-              path="/alunos"
-              element={
-                <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
-                  <Alunos />
-                </RoleProtectedRoute>
-              }
-            />
-            <Route
-              path="/alunos/novo"
-              element={
-                <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
-                  <EditarAluno />
-                </RoleProtectedRoute>
-              }
-            />
-            <Route
-              path="/alunos/treino"
-              element={
-                <RoleProtectedRoute roles={["MANAGER", "TEACHER"]}>
-                  <EditarTreino />
-                </RoleProtectedRoute>
-              }
-            />
-            <Route
-              path="/alunos/:id"
-              element={
-                <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
-                  <EditarAluno />
-                </RoleProtectedRoute>
-              }
-            />
-            <Route
-              path="/financeiro"
-              element={
-                <RoleProtectedRoute roles={["MANAGER"]}>
-                  <Financeiro />
-                </RoleProtectedRoute>
-              }
-            />
-            <Route
-              path="/funcionarios"
-              element={
-                <RoleProtectedRoute roles={["MANAGER"]}>
-                  <Funcionarios />
-                </RoleProtectedRoute>
-              }
-            />
-            <Route
-              path="/controle-acesso"
-              element={
-                <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
-                  <ControleAcesso />
-                </RoleProtectedRoute>
-              }
-            />
-            <Route
-              path="/dados-academia"
-              element={
-                <ProtectedRoute>
-                  <DadosAcademia />
-                </ProtectedRoute>
-              }
-            />
+            <Route element={<Layout />}>
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/comunicacao"
+                element={
+                  <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
+                    <Comunicacao />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/planos"
+                element={
+                  <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
+                    <Planos />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/aulas"
+                element={
+                  <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
+                    <Aulas />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/alunos"
+                element={
+                  <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
+                    <Alunos />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/alunos/novo"
+                element={
+                  <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
+                    <EditarAluno />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/alunos/treino"
+                element={
+                  <RoleProtectedRoute roles={["MANAGER", "TEACHER"]}>
+                    <EditarTreino />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/alunos/:id"
+                element={
+                  <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
+                    <EditarAluno />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/financeiro"
+                element={
+                  <RoleProtectedRoute roles={["MANAGER"]}>
+                    <Financeiro />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/funcionarios"
+                element={
+                  <RoleProtectedRoute roles={["MANAGER"]}>
+                    <Funcionarios />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/controle-acesso"
+                element={
+                  <RoleProtectedRoute roles={["MANAGER", "RECEPTIONIST"]}>
+                    <ControleAcesso />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/dados-academia"
+                element={
+                  <ProtectedRoute>
+                    <DadosAcademia />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
             <Route path="/relatorios" element={<Navigate to="/financeiro" replace />} />
             <Route path="/acesso" element={<Navigate to="/controle-acesso" replace />} />
             <Route path="*" element={<NotFound />} />

@@ -195,9 +195,8 @@ const Comunicacao = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
-        <div className="flex items-center justify-between px-4 h-14 max-w-5xl mx-auto">
+    <div className="space-y-3">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/dashboard")}
@@ -205,8 +204,7 @@ const Comunicacao = () => {
             >
               <ArrowLeft size={20} />
             </button>
-            <img src={logo} alt="GymLabz" className="w-8 h-8 object-contain" />
-            <span className="text-base font-bold">Comunicação</span>
+            <h1 className="text-2xl font-bold text-foreground">Comunicação</h1>
           </div>
           <Button
             size="sm"
@@ -219,9 +217,6 @@ const Comunicacao = () => {
             <Plus size={16} className="mr-1" /> Novo
           </Button>
         </div>
-      </header>
-
-      <main className="px-4 py-4 max-w-5xl mx-auto space-y-3">
         {error && (
           <div className="p-3 rounded-lg bg-destructive/20 text-destructive text-sm">
             {error}
@@ -436,7 +431,6 @@ const Comunicacao = () => {
             </div>
           ))
         )}
-      </main>
     </div>
   );
 };

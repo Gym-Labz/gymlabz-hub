@@ -144,27 +144,18 @@ const Financeiro = () => {
   const isLoading = loading[activeTab];
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
-        <div className="flex items-center justify-between px-4 h-16 max-w-5xl mx-auto">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <img src={logo} alt="GymLabz" className="w-9 h-9 object-contain" />
-            <span className="text-lg font-bold tracking-tight">
-              Gym<span className="gym-text-gradient">Labz</span>
-            </span>
-          </div>
+    <div className="w-full">
+        <div className="flex items-center gap-3 mb-1">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <h1 className="text-2xl font-bold text-foreground">
+            Financeiro e Relatórios
+          </h1>
         </div>
-      </header>
-      <main className="px-4 py-6 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold text-foreground mb-1">
-          Financeiro e Relatórios
-        </h1>
         <p className="text-sm text-muted-foreground mb-5">
           Receitas, métricas e análises da academia
         </p>
@@ -810,15 +801,16 @@ const Financeiro = () => {
                         <ChartTooltip
                           content={
                             <ChartTooltipContent
-                              formatter={(v, _name, _item, _index, payload) =>
-                                payload ? (
+                              formatter={(v, _name, _item) => {
+                                const p = _item?.payload as Record<string, unknown>;
+                                return p ? (
                                   <span>
-                                    {payload.uso} / {payload.máximo} ({v}%)
+                                    {String(p.uso)} / {String(p.máximo)} ({v}%)
                                   </span>
                                 ) : (
                                   <span>{v}%</span>
-                                )
-                              }
+                                );
+                              }}
                             />
                           }
                         />
@@ -858,7 +850,7 @@ const Financeiro = () => {
             )}
           </TabsContent>
         </Tabs>
-      </main>
+
     </div>
   );
 };

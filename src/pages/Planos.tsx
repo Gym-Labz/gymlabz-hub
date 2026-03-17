@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, Pencil, Trash2, X, Loader2, Info, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import logo from "@/assets/gymlabz-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   getPlans,
@@ -149,21 +148,21 @@ const Planos = () => {
     typeof b === "string" ? b : (b?.name || b?.title || b?.description || "");
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
-        <div className="flex items-center justify-between px-4 h-16 max-w-5xl mx-auto">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <img src={logo} alt="GymLabz" className="w-9 h-9 object-contain" />
-            <span className="text-lg font-bold tracking-tight">
-              Gym<span className="gym-text-gradient">Labz</span>
-            </span>
+    <>
+        <div className="flex items-center justify-between mb-4 mt-2">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <h1 className="text-2xl font-bold text-foreground">Planos</h1>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Gerencie os planos da academia
+            </p>
           </div>
           {canManage && (
             <Button onClick={openNew} size="sm" className="gap-1.5">
@@ -172,14 +171,6 @@ const Planos = () => {
             </Button>
           )}
         </div>
-      </header>
-
-      {/* Content */}
-      <main className="px-4 py-6 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold text-foreground mb-1">Planos</h1>
-        <p className="text-sm text-muted-foreground mb-6">
-          Gerencie os planos da academia
-        </p>
 
         {error && (
           <div className="p-3 rounded-lg bg-destructive/20 text-destructive text-sm mb-4">
@@ -256,8 +247,6 @@ const Planos = () => {
             ))}
           </div>
         )}
-      </main>
-
       {/* Modal Criar/Editar */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
@@ -482,7 +471,7 @@ const Planos = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

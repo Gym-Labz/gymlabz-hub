@@ -85,6 +85,7 @@ const ControleAcesso = () => {
 
   useEffect(() => {
     fetchRegistros();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, startDate, endDate, page]);
 
   const filtered = registros.filter((r) =>
@@ -153,20 +154,23 @@ const ControleAcesso = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
-        <div className="flex items-center justify-between px-4 h-16 max-w-5xl mx-auto">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <img src={logo} alt="GymLabz" className="w-9 h-9 object-contain" />
-            <span className="text-lg font-bold tracking-tight">
-              Gym<span className="gym-text-gradient">Labz</span>
-            </span>
+    <div className="space-y-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <h1 className="text-2xl font-bold text-foreground">
+                Controle de Acesso
+              </h1>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Registros de entrada/saída e regras de acesso
+            </p>
           </div>
           {canManageRegras && (
             <Button onClick={openNew} size="sm" className="gap-1.5">
@@ -174,17 +178,6 @@ const ControleAcesso = () => {
               Nova Regra
             </Button>
           )}
-        </div>
-      </header>
-
-      <main className="px-4 py-6 max-w-5xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground mb-1">
-            Controle de Acesso
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Registros de entrada/saída e regras de acesso
-          </p>
         </div>
 
         {error && (
@@ -404,7 +397,7 @@ const ControleAcesso = () => {
             ))}
           </div>
         </section>
-      </main>
+
 
       {/* Modal Nova/Editar Regra */}
       {modalOpen && (
