@@ -80,7 +80,7 @@ const CHART_COLORS = [
 const Financeiro = () => {
   const navigate = useNavigate();
   const { token } = useAuth();
-  const [activeTab, setActiveTab] = useState("financeiro");
+  const [activeTab, setActiveTab] = useState("acesso");
   const [financial, setFinancial] = useState<FinancialReport | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [members, setMembers] = useState<MembersReport | null>(null);
@@ -146,14 +146,8 @@ const Financeiro = () => {
   return (
     <div className="w-full">
         <div className="flex items-center gap-3 mb-1">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </button>
           <h1 className="text-2xl font-bold text-foreground">
-            Financeiro e Relatórios
+            Dashboard
           </h1>
         </div>
         <p className="text-sm text-muted-foreground mb-5">
@@ -169,6 +163,10 @@ const Financeiro = () => {
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6 w-full flex-wrap h-auto gap-1">
+            <TabsTrigger value="acesso" className="gap-1.5">
+              <DoorOpen size={16} />
+              Acesso
+            </TabsTrigger>
             <TabsTrigger value="financeiro" className="gap-1.5">
               <DollarSign size={16} />
               Financeiro
@@ -176,10 +174,6 @@ const Financeiro = () => {
             <TabsTrigger value="membros" className="gap-1.5">
               <Users size={16} />
               Membros
-            </TabsTrigger>
-            <TabsTrigger value="acesso" className="gap-1.5">
-              <DoorOpen size={16} />
-              Acesso
             </TabsTrigger>
             <TabsTrigger value="pico" className="gap-1.5">
               <Activity size={16} />

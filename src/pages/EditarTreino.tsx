@@ -182,12 +182,6 @@ const EditarTreino = () => {
     <div className="max-w-2xl mx-auto w-full">
         <div className="flex items-center justify-between mb-6 mt-4">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/alunos")}
-              className="p-2 rounded-lg hover:bg-secondary transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </button>
             <div className="flex items-center gap-2">
               <Dumbbell size={24} className="text-primary" />
               <h1 className="text-2xl font-bold text-foreground">

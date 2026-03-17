@@ -198,12 +198,6 @@ const Comunicacao = () => {
     <div className="space-y-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </button>
             <h1 className="text-2xl font-bold text-foreground">Comunicação</h1>
           </div>
           <Button

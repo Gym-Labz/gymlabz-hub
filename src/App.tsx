@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth, type ProfileEmployee } from "@/contexts/AuthContext";
 import Login from "./pages/Login.tsx";
-import Dashboard from "./pages/Dashboard.tsx";
 import Comunicacao from "./pages/Comunicacao.tsx";
 import Planos from "./pages/Planos.tsx";
 import Alunos from "./pages/Alunos.tsx";
@@ -60,7 +59,7 @@ const App = () => (
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
-                    <Dashboard />
+                    <Financeiro />
                   </ProtectedRoute>
                 }
               />

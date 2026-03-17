@@ -431,12 +431,6 @@ const EditarAluno = () => {
     <div className="max-w-2xl mx-auto w-full">
         <div className="flex items-center justify-between mb-6 mt-4">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/alunos")}
-              className="p-2 rounded-lg hover:bg-secondary transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </button>
             <h1 className="text-2xl font-bold text-foreground">
               {isEdit ? "Editar Aluno" : "Novo Aluno"}
             </h1>

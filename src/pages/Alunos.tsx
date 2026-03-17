@@ -366,12 +366,6 @@ const Alunos = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <button
-                onClick={() => navigate("/dashboard")}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <ArrowLeft size={20} />
-              </button>
               <h1 className="text-2xl font-bold text-foreground">Alunos</h1>
             </div>
             <p className="text-sm text-muted-foreground">

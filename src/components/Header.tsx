@@ -32,7 +32,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
-      <div className="flex items-center justify-between px-4 h-16 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between px-6 h-16 w-full">
         <div className="flex items-center gap-3">
           <img src={logo} alt="GymLabz" className="w-20 h-20 object-contain" />
           <span className="text-lg font-bold tracking-tight text-foreground truncate max-w-[180px] sm:max-w-none">
