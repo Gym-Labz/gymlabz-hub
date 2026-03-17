@@ -79,7 +79,7 @@ const CHART_COLORS = [
 
 const Financeiro = () => {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, hasRole } = useAuth();
   const [activeTab, setActiveTab] = useState("acesso");
   const [financial, setFinancial] = useState<FinancialReport | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -167,14 +167,18 @@ const Financeiro = () => {
               <DoorOpen size={16} />
               Acesso
             </TabsTrigger>
-            <TabsTrigger value="financeiro" className="gap-1.5">
-              <DollarSign size={16} />
-              Financeiro
-            </TabsTrigger>
-            <TabsTrigger value="membros" className="gap-1.5">
-              <Users size={16} />
-              Membros
-            </TabsTrigger>
+            {hasRole("MANAGER") && (
+              <>
+                <TabsTrigger value="financeiro" className="gap-1.5">
+                  <DollarSign size={16} />
+                  Financeiro
+                </TabsTrigger>
+                <TabsTrigger value="membros" className="gap-1.5">
+                  <Users size={16} />
+                  Membros
+                </TabsTrigger>
+              </>
+            )}
             <TabsTrigger value="pico" className="gap-1.5">
               <Activity size={16} />
               Horários de Pico
@@ -186,7 +190,8 @@ const Financeiro = () => {
           </TabsList>
 
           {/* Tab Financeiro */}
-          <TabsContent value="financeiro">
+          {hasRole("MANAGER") && (
+            <TabsContent value="financeiro">
             {isLoading ? (
               <div className="flex justify-center py-20">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -427,10 +432,12 @@ const Financeiro = () => {
                 </div>
               </div>
             )}
-          </TabsContent>
+            </TabsContent>
+          )}
 
           {/* Tab Membros */}
-          <TabsContent value="membros">
+          {hasRole("MANAGER") && (
+            <TabsContent value="membros">
             {isLoading ? (
               <div className="flex justify-center py-20">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -530,7 +537,8 @@ const Financeiro = () => {
                 Nenhum dado disponível.
               </p>
             )}
-          </TabsContent>
+            </TabsContent>
+          )}
 
           {/* Tab Acesso */}
           <TabsContent value="acesso">

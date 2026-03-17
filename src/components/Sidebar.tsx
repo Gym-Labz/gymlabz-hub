@@ -54,12 +54,6 @@ const menuItems: MenuItem[] = [
     roles: ["MANAGER", "RECEPTIONIST"],
   },
   {
-    title: "Financeiro",
-    icon: DollarSign,
-    route: "/financeiro",
-    roles: ["MANAGER"],
-  },
-  {
     title: "Funcionários",
     icon: UserCog,
     route: "/funcionarios",
@@ -88,8 +82,6 @@ export default function Sidebar() {
   }
 
   const filteredItems = menuItems.filter((item) => {
-    // Receptionist shouldn't see financeiro even if they somehow navigate there
-    if (item.route === "/financeiro" && profile === "RECEPTIONIST") return false
     return hasRole(...item.roles)
   })
 

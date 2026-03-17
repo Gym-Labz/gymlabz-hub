@@ -120,14 +120,6 @@ const App = () => (
                 }
               />
               <Route
-                path="/financeiro"
-                element={
-                  <RoleProtectedRoute roles={["MANAGER"]}>
-                    <Financeiro />
-                  </RoleProtectedRoute>
-                }
-              />
-              <Route
                 path="/funcionarios"
                 element={
                   <RoleProtectedRoute roles={["MANAGER"]}>
