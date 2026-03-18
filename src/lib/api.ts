@@ -10,7 +10,7 @@ const USE_LOCAL_BACKEND = false;
 const PROD_URL = "https://gym-core-backend-3c424d5dacf3.herokuapp.com";
 const LOCAL_URL = "/api";
 
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? PROD_URL : (USE_LOCAL_BACKEND ? LOCAL_URL : PROD_URL));
+const API_URL = USE_LOCAL_BACKEND ? LOCAL_URL : PROD_URL;
 
 export const getApiUrl = () => API_URL;
 
