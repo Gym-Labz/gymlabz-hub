@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Pencil, Trash2, X, Loader2, Info, Check } from "lucide
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
+import { CollapsibleCard } from "@/components/CollapsibleCard";
 import {
   getPlans,
   createPlan,
@@ -189,16 +190,23 @@ const Planos = () => {
             {planos.map((plano) => (
               <div
                 key={plano.id}
-                className="flex items-center justify-between p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors"
+                className="rounded-xl bg-card border border-border hover:border-primary/30 transition-colors overflow-hidden"
               >
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-foreground truncate">
-                    {plano.name}
-                  </p>
-                  <div className="flex items-center gap-4 mt-1 flex-wrap">
-                    <span className="text-sm font-medium text-primary">
-                      {formatCurrency(Number(plano.price))}
-                    </span>
+                {/* ── Mobile: collapsible ── */}
+                <CollapsibleCard
+                  className="sm:hidden"
+                  header={
+                    <>
+                      <span className="font-semibold text-foreground truncate flex-1 min-w-0 text-sm">
+                        {plano.name}
+                      </span>
+                      <span className="text-sm font-medium text-primary shrink-0">
+                        {formatCurrency(Number(plano.price))}
+                      </span>
+                    </>
+                  }
+                >
+                  <div className="flex flex-wrap gap-2 pt-3 pb-2">
                     <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary font-medium">
                       {BILLING_CYCLE_LABELS[plano.billingCycle as BillingCycle]}
                     </span>
@@ -211,31 +219,81 @@ const Planos = () => {
                       Criado em {formatDate(plano.createdAt)}
                     </span>
                   </div>
-                </div>
-                <div className="flex items-center gap-1 ml-3">
-                  <button
-                    onClick={() => setDetailsPlano(plano)}
-                    className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-                    title="Ver detalhes do plano"
-                  >
-                    <Info size={16} />
-                  </button>
-                  {canManage && (
-                    <>
-                      <button
-                        onClick={() => openEdit(plano)}
-                        className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-                      >
-                        <Pencil size={16} />
-                      </button>
-                      <button
-                        onClick={() => setDeleteId(plano.id)}
-                        className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </>
-                  )}
+                  <div className={`grid gap-2 mt-1 ${canManage ? "grid-cols-3" : "grid-cols-1"}`}>
+                    <button
+                      onClick={() => setDetailsPlano(plano)}
+                      className="flex flex-col items-center gap-1 py-2.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                    >
+                      <Info size={18} />
+                      <span className="text-xs">Detalhes</span>
+                    </button>
+                    {canManage && (
+                      <>
+                        <button
+                          onClick={() => openEdit(plano)}
+                          className="flex flex-col items-center gap-1 py-2.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                        >
+                          <Pencil size={18} />
+                          <span className="text-xs">Editar</span>
+                        </button>
+                        <button
+                          onClick={() => setDeleteId(plano.id)}
+                          className="flex flex-col items-center gap-1 py-2.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                        >
+                          <Trash2 size={18} />
+                          <span className="text-xs">Excluir</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </CollapsibleCard>
+
+                {/* ── Desktop: layout completo ── */}
+                <div className="hidden sm:flex items-center justify-between p-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-foreground truncate">{plano.name}</p>
+                    <div className="flex items-center gap-4 mt-1 flex-wrap">
+                      <span className="text-sm font-medium text-primary">
+                        {formatCurrency(Number(plano.price))}
+                      </span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary font-medium">
+                        {BILLING_CYCLE_LABELS[plano.billingCycle as BillingCycle]}
+                      </span>
+                      {plano.includesClasses && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 font-medium">
+                          Plano full
+                        </span>
+                      )}
+                      <span className="text-xs text-muted-foreground">
+                        Criado em {formatDate(plano.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 ml-3 shrink-0">
+                    <button
+                      onClick={() => setDetailsPlano(plano)}
+                      className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                      title="Ver detalhes do plano"
+                    >
+                      <Info size={16} />
+                    </button>
+                    {canManage && (
+                      <>
+                        <button
+                          onClick={() => openEdit(plano)}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteId(plano.id)}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

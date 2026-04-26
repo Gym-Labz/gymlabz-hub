@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, Pencil, X, Search, Loader2, DollarSign, DoorOpen, Dumbbell, Edit3 } from "lucide-react";
+import { CollapsibleCard } from "@/components/CollapsibleCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -437,25 +438,23 @@ const Alunos = () => {
         ) : (
           <div className="grid gap-3">
             {filtered.map((aluno) => (
-              <div
-                key={aluno.id}
-                className="p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <Avatar className="h-12 w-12 shrink-0">
-                      {aluno.imageUrl && (
-                        <AvatarImage src={aluno.imageUrl} alt={aluno.nome} />
-                      )}
-                      <AvatarFallback className="bg-primary/20 text-primary font-semibold text-sm">
-                        {getIniciais(aluno.nome)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold text-foreground truncate">
+                <div
+                  key={aluno.id}
+                  className="rounded-xl bg-card border border-border hover:border-primary/30 transition-colors overflow-hidden"
+                >
+                  {/* ── Mobile: collapsible ── */}
+                  <CollapsibleCard
+                    className="sm:hidden"
+                    header={
+                      <>
+                        <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                          <span className="text-xs font-bold text-primary">
+                            {getIniciais(aluno.nome)}
+                          </span>
+                        </div>
+                        <span className="font-semibold text-foreground truncate flex-1 min-w-0 text-sm">
                           {aluno.nome}
-                        </p>
+                        </span>
                         <span
                           className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
                             aluno.status === "ativo"
@@ -465,49 +464,132 @@ const Alunos = () => {
                         >
                           {aluno.status}
                         </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/alunos/${aluno.id}`);
+                          }}
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors shrink-0"
+                          title="Editar"
+                        >
+                          <Pencil size={15} />
+                        </button>
+                      </>
+                    }
+                  >
+                    <div className="flex items-center gap-3 py-3">
+                      <Avatar className="h-12 w-12 shrink-0">
+                        {aluno.imageUrl && (
+                          <AvatarImage src={aluno.imageUrl} alt={aluno.nome} />
+                        )}
+                        <AvatarFallback className="bg-primary/20 text-primary font-semibold text-sm">
+                          {getIniciais(aluno.nome)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm text-muted-foreground truncate">{aluno.email}</p>
+                        {aluno.plano !== "-" && (
+                          <p className="text-xs text-primary font-medium truncate mt-0.5">
+                            {aluno.plano}
+                          </p>
+                        )}
                       </div>
-                      <div className="flex items-center gap-4 mt-1">
-                        <span className="text-sm text-muted-foreground truncate">
-                          {aluno.email}
-                        </span>
-                        <span className="text-xs text-primary font-medium shrink-0">
-                          {aluno.plano}
-                        </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        onClick={() => openAccessModal(aluno)}
+                        className="flex flex-col items-center gap-1 py-2.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                      >
+                        <DoorOpen size={18} />
+                        <span className="text-xs">Acessos</span>
+                      </button>
+                      <button
+                        onClick={() => openTrainingModal(aluno)}
+                        className="flex flex-col items-center gap-1 py-2.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                      >
+                        <Dumbbell size={18} />
+                        <span className="text-xs">Treino</span>
+                      </button>
+                      <button
+                        onClick={() => openFinanceModal(aluno)}
+                        className="flex flex-col items-center gap-1 py-2.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                      >
+                        <DollarSign size={18} />
+                        <span className="text-xs">Financeiro</span>
+                      </button>
+                    </div>
+                  </CollapsibleCard>
+
+                  {/* ── Desktop: layout completo ── */}
+                  <div className="hidden sm:block p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <Avatar className="h-12 w-12 shrink-0">
+                          {aluno.imageUrl && (
+                            <AvatarImage src={aluno.imageUrl} alt={aluno.nome} />
+                          )}
+                          <AvatarFallback className="bg-primary/20 text-primary font-semibold text-sm">
+                            {getIniciais(aluno.nome)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-foreground truncate">
+                              {aluno.nome}
+                            </p>
+                            <span
+                              className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+                                aluno.status === "ativo"
+                                  ? "bg-primary/20 text-primary"
+                                  : "bg-destructive/20 text-destructive"
+                              }`}
+                            >
+                              {aluno.status}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 mt-1">
+                            <span className="text-sm text-muted-foreground truncate">
+                              {aluno.email}
+                            </span>
+                            <span className="text-xs text-primary font-medium shrink-0">
+                              {aluno.plano}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 ml-3 shrink-0">
+                        <button
+                          onClick={() => openAccessModal(aluno)}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                          title="Acessos"
+                        >
+                          <DoorOpen size={16} />
+                        </button>
+                        <button
+                          onClick={() => openTrainingModal(aluno)}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                          title="Treino"
+                        >
+                          <Dumbbell size={16} />
+                        </button>
+                        <button
+                          onClick={() => openFinanceModal(aluno)}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                          title="Detalhes financeiros"
+                        >
+                          <DollarSign size={16} />
+                        </button>
+                        <button
+                          onClick={() => navigate(`/alunos/${aluno.id}`)}
+                          className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                          title="Editar"
+                        >
+                          <Pencil size={16} />
+                        </button>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 ml-3">
-                    <button
-                      onClick={() => openAccessModal(aluno)}
-                      className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                      title="Acessos"
-                    >
-                      <DoorOpen size={16} />
-                    </button>
-                    <button
-                      onClick={() => openTrainingModal(aluno)}
-                      className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                      title="Treino"
-                    >
-                      <Dumbbell size={16} />
-                    </button>
-                    <button
-                      onClick={() => openFinanceModal(aluno)}
-                      className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                      title="Detalhes financeiros"
-                    >
-                      <DollarSign size={16} />
-                    </button>
-                    <button
-                      onClick={() => navigate(`/alunos/${aluno.id}`)}
-                      className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-                      title="Editar"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                  </div>
                 </div>
-              </div>
             ))}
           </div>
         )}
