@@ -12,11 +12,7 @@ import {
   removeUserFromGym,
   type UpdateUserRequest,
 } from "@/lib/users-api";
-import {
-  addSubscription,
-  updateSubscription,
-  getUserSubscriptions,
-} from "@/lib/subscriptions-api";
+import { addSubscription, updateSubscription, getUserSubscriptions } from "@/lib/subscriptions-api";
 import { getPlans } from "@/lib/plans-api";
 import { getUserImages, uploadUserImage } from "@/lib/user-images-api";
 
@@ -296,7 +292,7 @@ const EditarAluno = () => {
       navigate("/alunos");
     } catch (err: unknown) {
       const msg = (err as { message?: string | string[] }).message;
-      setError(Array.isArray(msg) ? msg.join(" ") : (msg || "Erro ao salvar aluno."));
+      setError(Array.isArray(msg) ? msg.join(" ") : msg || "Erro ao salvar aluno.");
     } finally {
       setSaving(false);
     }
@@ -332,9 +328,7 @@ const EditarAluno = () => {
         }
       }, 100);
     } catch (err) {
-      setCameraError(
-        "Não foi possível acessar a câmera. Verifique as permissões do navegador."
-      );
+      setCameraError("Não foi possível acessar a câmera. Verifique as permissões do navegador.");
     }
   };
 
@@ -401,9 +395,7 @@ const EditarAluno = () => {
             await loadUserImages();
             closeCameraModal();
           } catch (err) {
-            setCameraError(
-              (err as { message?: string }).message || "Erro ao enviar foto."
-            );
+            setCameraError((err as { message?: string }).message || "Erro ao enviar foto.");
           } finally {
             setUploadPhotoLoading(false);
           }
@@ -429,433 +421,396 @@ const EditarAluno = () => {
 
   return (
     <div className="w-full">
-        <div className="flex items-center justify-between mb-6 mt-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-foreground">
-              {isEdit ? "Editar Aluno" : "Novo Aluno"}
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="secondary" onClick={() => navigate("/alunos")} disabled={saving}>
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={
-                saving ||
-                loading ||
-                !nome.trim() ||
-                (!isEdit &&
-                  (!cpf.replace(/\D/g, "").match(/^\d{11}$/) || !username.trim()))
-              }
-            >
-              {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-              Salvar
-            </Button>
-          </div>
+      <div className="flex items-center justify-between mb-6 mt-4">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-foreground">
+            {isEdit ? "Editar Aluno" : "Novo Aluno"}
+          </h1>
         </div>
-        {error && (
-          <div className="p-4 rounded-lg bg-destructive/10 text-destructive text-sm mb-6">
-            {error}
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" onClick={() => navigate("/alunos")} disabled={saving}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={
+              saving ||
+              loading ||
+              !nome.trim() ||
+              (!isEdit && (!cpf.replace(/\D/g, "").match(/^\d{11}$/) || !username.trim()))
+            }
+          >
+            {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+            Salvar
+          </Button>
+        </div>
+      </div>
+      {error && (
+        <div className="p-4 rounded-lg bg-destructive/10 text-destructive text-sm mb-6">
+          {error}
+        </div>
+      )}
 
-        {loading ? (
-          <div className="flex items-center justify-center py-16 gap-2 text-muted-foreground">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span>Carregando dados...</span>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Foto do aluno */}
-            <section className="space-y-4">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase">
-                Foto do aluno
-              </h2>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20 shrink-0">
-                  {(isEdit ? primaryImageUrl : pendingPhotoPreviewUrl) && (
-                    <AvatarImage
-                      src={(isEdit ? primaryImageUrl : pendingPhotoPreviewUrl) ?? ""}
-                      alt={nome}
-                    />
-                  )}
-                  <AvatarFallback className="bg-primary/20 text-primary font-semibold text-xl">
-                    {getIniciais(nome)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                    onClick={openCameraModal}
-                  >
-                    <Camera size={18} />
-                    Tirar foto
-                  </Button>
-                  {!isEdit && (
-                    <>
-                      <label className="cursor-pointer">
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="sr-only"
-                          onChange={handleFileSelect}
-                        />
-                        <span className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
-                          Enviar foto do dispositivo
-                        </span>
-                      </label>
-                      {pendingPhotoFile && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="gap-2 text-muted-foreground hover:text-destructive"
-                          onClick={removePendingPhoto}
-                        >
-                          <X size={16} />
-                          Remover foto
-                        </Button>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            </section>
-
-            {/* Dados básicos */}
-            <section className="space-y-4">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase">
-                Dados básicos
-              </h2>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-1.5">
-                  Nome completo
-                </label>
-                <Input
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  placeholder="Nome completo"
-                  readOnly={!!isEdit}
-                  className={isEdit ? "bg-muted" : ""}
-                />
-                {isEdit && (
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Nome não pode ser alterado
-                  </p>
+      {loading ? (
+        <div className="flex items-center justify-center py-16 gap-2 text-muted-foreground">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Carregando dados...</span>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {/* Foto do aluno */}
+          <section className="space-y-4">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase">Foto do aluno</h2>
+            <div className="flex items-center gap-4">
+              <Avatar className="h-20 w-20 shrink-0">
+                {(isEdit ? primaryImageUrl : pendingPhotoPreviewUrl) && (
+                  <AvatarImage
+                    src={(isEdit ? primaryImageUrl : pendingPhotoPreviewUrl) ?? ""}
+                    alt={nome}
+                  />
+                )}
+                <AvatarFallback className="bg-primary/20 text-primary font-semibold text-xl">
+                  {getIniciais(nome)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={openCameraModal}
+                >
+                  <Camera size={18} />
+                  Tirar foto
+                </Button>
+                {!isEdit && (
+                  <>
+                    <label className="cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="sr-only"
+                        onChange={handleFileSelect}
+                      />
+                      <span className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
+                        Enviar foto do dispositivo
+                      </span>
+                    </label>
+                    {pendingPhotoFile && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="gap-2 text-muted-foreground hover:text-destructive"
+                        onClick={removePendingPhoto}
+                      >
+                        <X size={16} />
+                        Remover foto
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-1.5">E-mail</label>
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="email@exemplo.com"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-1.5">
-                  Usuário (login)
-                </label>
-                <Input
-                  value={username}
-                  onChange={(e) =>
-                    setUsername(e.target.value.toLowerCase().replace(/\s/g, ""))
-                  }
-                  placeholder="usuario123"
-                />
-              </div>
+            </div>
+          </section>
+
+          {/* Dados básicos */}
+          <section className="space-y-4">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase">Dados básicos</h2>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">
+                Nome completo
+              </label>
+              <Input
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Nome completo"
+                readOnly={!!isEdit}
+                className={isEdit ? "bg-muted" : ""}
+              />
               {isEdit && (
-                <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
-                    Nova senha (deixe em branco para não alterar)
-                  </label>
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                  />
-                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Nome não pode ser alterado</p>
               )}
-              {!isEdit && (
-                <>
-                  <div>
-                    <label className="text-sm font-medium text-foreground block mb-1.5">CPF</label>
-                    <Input
-                      value={formatCpf(cpf)}
-                      onChange={(e) =>
-                        setCpf(e.target.value.replace(/\D/g, "").slice(0, 11))
-                      }
-                      placeholder="000.000.000-00"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-foreground block mb-1.5">
-                      Gênero
-                    </label>
-                    <select
-                      value={genero}
-                      onChange={(e) => setGenero(e.target.value)}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      <option value="masculino">Masculino</option>
-                      <option value="feminino">Feminino</option>
-                      <option value="outro">Outro</option>
-                    </select>
-                  </div>
-                </>
-              )}
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-1.5">
-                  Data de nascimento
-                </label>
-                <Input
-                  type="date"
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                />
-              </div>
-              {planos.length > 0 && (
-                <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
-                    Plano {isEdit ? "" : "(opcional)"}
-                  </label>
-                  <select
-                    ref={planSelectRef}
-                    value={planoId}
-                    onChange={(e) => setPlanoId(e.target.value)}
-                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                  >
-                    <option value="">Nenhum</option>
-                    {planos.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </section>
-
-            {/* Contato */}
-            <section className="space-y-4 pt-6 border-t border-border">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase">
-                Contato
-              </h2>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-1.5">
-                  Telefone
-                </label>
-                <Input
-                  value={formatPhone(phone)}
-                  onChange={(e) =>
-                    setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))
-                  }
-                  placeholder="(00) 00000-0000"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-1.5">
-                  Contato de emergência
-                </label>
-                <Input
-                  value={emergencyContactName}
-                  onChange={(e) => setEmergencyContactName(e.target.value)}
-                  placeholder="Nome"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-1.5">
-                  Telefone de emergência
-                </label>
-                <Input
-                  value={formatPhone(emergencyContactPhone)}
-                  onChange={(e) =>
-                    setEmergencyContactPhone(e.target.value.replace(/\D/g, "").slice(0, 11))
-                  }
-                  placeholder="(00) 00000-0000"
-                />
-              </div>
-            </section>
-
-            {/* Endereço */}
-            <section className="space-y-4 pt-6 border-t border-border">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase">
-                Endereço
-              </h2>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-1.5">CEP</label>
-                <Input
-                  value={formatCep(postalCode)}
-                  onChange={(e) =>
-                    setPostalCode(e.target.value.replace(/\D/g, "").slice(0, 8))
-                  }
-                  placeholder="00000-000"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-1.5">Rua</label>
-                <Input
-                  value={street}
-                  onChange={(e) => setStreet(e.target.value)}
-                  placeholder="Rua, Avenida..."
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
-                    Número
-                  </label>
-                  <Input
-                    value={number}
-                    onChange={(e) => setNumber(e.target.value)}
-                    placeholder="Nº"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
-                    Complemento
-                  </label>
-                  <Input
-                    value={complement}
-                    onChange={(e) => setComplement(e.target.value)}
-                    placeholder="Apto, Bloco..."
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-1.5">Bairro</label>
-                <Input
-                  value={neighborhood}
-                  onChange={(e) => setNeighborhood(e.target.value)}
-                  placeholder="Bairro"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
-                    Cidade
-                  </label>
-                  <Input
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="Cidade"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
-                    Estado
-                  </label>
-                  <Input
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    placeholder="UF"
-                    maxLength={2}
-                  />
-                </div>
-              </div>
-            </section>
-
-            {/* Saúde */}
-            <section className="space-y-4 pt-6 border-t border-border">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase">
-                Informações de saúde
-              </h2>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
-                    Peso (kg)
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
-                    Altura (m)
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={height}
-                    onChange={(e) => setHeight(e.target.value)}
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground block mb-1.5">
-                  Condições pré-existentes
-                </label>
-                <Input
-                  value={preExistingConditions}
-                  onChange={(e) => setPreExistingConditions(e.target.value)}
-                  placeholder="Ex: diabetes, hipertensão..."
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="hasInjuryHistory"
-                  checked={hasInjuryHistory}
-                  onChange={(e) => setHasInjuryHistory(e.target.checked)}
-                  className="rounded border-input"
-                />
-                <label htmlFor="hasInjuryHistory" className="text-sm font-medium text-foreground">
-                  Possui histórico de lesões
-                </label>
-              </div>
-              {hasInjuryHistory && (
-                <div>
-                  <label className="text-sm font-medium text-foreground block mb-1.5">
-                    Histórico de lesões
-                  </label>
-                  <Input
-                    value={injuryHistory}
-                    onChange={(e) => setInjuryHistory(e.target.value)}
-                    placeholder="Descreva..."
-                  />
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="medicalCertificateProvided"
-                  checked={medicalCertificateProvided}
-                  onChange={(e) => setMedicalCertificateProvided(e.target.checked)}
-                  className="rounded border-input"
-                />
-                <label
-                  htmlFor="medicalCertificateProvided"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Atestado médico fornecido
-                </label>
-              </div>
-            </section>
-
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">E-mail</label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="email@exemplo.com"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">
+                Usuário (login)
+              </label>
+              <Input
+                value={username}
+                onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ""))}
+                placeholder="usuario123"
+              />
+            </div>
             {isEdit && (
-              <div className="pt-6 border-t border-border">
-                <button
-                  onClick={() => setDeleteConfirm(true)}
-                  className="text-sm text-muted-foreground hover:text-destructive transition-colors"
-                >
-                  Excluir aluno
-                </button>
+              <div>
+                <label className="text-sm font-medium text-foreground block mb-1.5">
+                  Nova senha (deixe em branco para não alterar)
+                </label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                />
               </div>
             )}
-          </div>
-        )}
+            {!isEdit && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-1.5">CPF</label>
+                  <Input
+                    value={formatCpf(cpf)}
+                    onChange={(e) => setCpf(e.target.value.replace(/\D/g, "").slice(0, 11))}
+                    placeholder="000.000.000-00"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground block mb-1.5">Gênero</label>
+                  <select
+                    value={genero}
+                    onChange={(e) => setGenero(e.target.value)}
+                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="masculino">Masculino</option>
+                    <option value="feminino">Feminino</option>
+                    <option value="outro">Outro</option>
+                  </select>
+                </div>
+              </>
+            )}
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">
+                Data de nascimento
+              </label>
+              <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+            </div>
+            {planos.length > 0 && (
+              <div>
+                <label className="text-sm font-medium text-foreground block mb-1.5">
+                  Plano {isEdit ? "" : "(opcional)"}
+                </label>
+                <select
+                  ref={planSelectRef}
+                  value={planoId}
+                  onChange={(e) => setPlanoId(e.target.value)}
+                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="">Nenhum</option>
+                  {planos.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </section>
 
+          {/* Contato */}
+          <section className="space-y-4 pt-6 border-t border-border">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase">Contato</h2>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">Telefone</label>
+              <Input
+                value={formatPhone(phone)}
+                onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
+                placeholder="(00) 00000-0000"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">
+                Contato de emergência
+              </label>
+              <Input
+                value={emergencyContactName}
+                onChange={(e) => setEmergencyContactName(e.target.value)}
+                placeholder="Nome"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">
+                Telefone de emergência
+              </label>
+              <Input
+                value={formatPhone(emergencyContactPhone)}
+                onChange={(e) =>
+                  setEmergencyContactPhone(e.target.value.replace(/\D/g, "").slice(0, 11))
+                }
+                placeholder="(00) 00000-0000"
+              />
+            </div>
+          </section>
+
+          {/* Endereço */}
+          <section className="space-y-4 pt-6 border-t border-border">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase">Endereço</h2>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">CEP</label>
+              <Input
+                value={formatCep(postalCode)}
+                onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                placeholder="00000-000"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">Rua</label>
+              <Input
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                placeholder="Rua, Avenida..."
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm font-medium text-foreground block mb-1.5">Número</label>
+                <Input
+                  value={number}
+                  onChange={(e) => setNumber(e.target.value)}
+                  placeholder="Nº"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground block mb-1.5">
+                  Complemento
+                </label>
+                <Input
+                  value={complement}
+                  onChange={(e) => setComplement(e.target.value)}
+                  placeholder="Apto, Bloco..."
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">Bairro</label>
+              <Input
+                value={neighborhood}
+                onChange={(e) => setNeighborhood(e.target.value)}
+                placeholder="Bairro"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm font-medium text-foreground block mb-1.5">Cidade</label>
+                <Input
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Cidade"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground block mb-1.5">Estado</label>
+                <Input
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  placeholder="UF"
+                  maxLength={2}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Saúde */}
+          <section className="space-y-4 pt-6 border-t border-border">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase">
+              Informações de saúde
+            </h2>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm font-medium text-foreground block mb-1.5">
+                  Peso (kg)
+                </label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground block mb-1.5">
+                  Altura (m)
+                </label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={height}
+                  onChange={(e) => setHeight(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">
+                Condições pré-existentes
+              </label>
+              <Input
+                value={preExistingConditions}
+                onChange={(e) => setPreExistingConditions(e.target.value)}
+                placeholder="Ex: diabetes, hipertensão..."
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="hasInjuryHistory"
+                checked={hasInjuryHistory}
+                onChange={(e) => setHasInjuryHistory(e.target.checked)}
+                className="rounded border-input"
+              />
+              <label htmlFor="hasInjuryHistory" className="text-sm font-medium text-foreground">
+                Possui histórico de lesões
+              </label>
+            </div>
+            {hasInjuryHistory && (
+              <div>
+                <label className="text-sm font-medium text-foreground block mb-1.5">
+                  Histórico de lesões
+                </label>
+                <Input
+                  value={injuryHistory}
+                  onChange={(e) => setInjuryHistory(e.target.value)}
+                  placeholder="Descreva..."
+                />
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="medicalCertificateProvided"
+                checked={medicalCertificateProvided}
+                onChange={(e) => setMedicalCertificateProvided(e.target.checked)}
+                className="rounded border-input"
+              />
+              <label
+                htmlFor="medicalCertificateProvided"
+                className="text-sm font-medium text-foreground"
+              >
+                Atestado médico fornecido
+              </label>
+            </div>
+          </section>
+
+          {isEdit && (
+            <div className="pt-6 border-t border-border">
+              <Button variant="destructive" onClick={() => setDeleteConfirm(true)}>
+                Excluir aluno
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Modal Excluir */}
       {deleteConfirm && (
@@ -880,11 +835,7 @@ const EditarAluno = () => {
                 onClick={handleDelete}
                 disabled={deleting}
               >
-                {deleting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  "Excluir"
-                )}
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Excluir"}
               </Button>
             </div>
           </div>
@@ -925,11 +876,7 @@ const EditarAluno = () => {
                     />
                   </div>
                   <div className="flex gap-3 mt-4">
-                    <Button
-                      variant="secondary"
-                      className="flex-1"
-                      onClick={closeCameraModal}
-                    >
+                    <Button variant="secondary" className="flex-1" onClick={closeCameraModal}>
                       Cancelar
                     </Button>
                     <Button
