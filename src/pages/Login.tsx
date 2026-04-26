@@ -74,7 +74,7 @@ const Login = () => {
     <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-background">
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center gap-4">
-          <img src={logo} alt="GymLabz" className="w-24 h-24 object-contain" />
+          {/* <img src={logo} alt="GymLabz" className="w-24 h-24 object-contain" /> */}
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Gym<span className="gym-text-gradient">Labz</span>
           </h1>
